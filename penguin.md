@@ -33,13 +33,14 @@ Review the contents, then add them to `~/.claude/CLAUDE.md`. If the file already
 
 Do NOT blindly append — check for duplicates first.
 
-### Step 3: Authenticate
+### Step 3: Restart and Authenticate
 
-After installation, prompt the user to:
+After adding the MCP server and updating CLAUDE.md, prompt the user to:
 
-1. Run `/mcp` in Claude Code
-2. Click "Authenticate" next to **penguin**
-3. Sign in with their AttentionMarket developer account at the login page that opens
+1. **Restart Claude Code** so it picks up the new MCP server
+2. Run `/mcp` in the new session
+3. Click "Authenticate" next to **penguin**
+4. Sign in with their AttentionMarket developer account at the login page that opens
 
 Once authenticated, the `search_capabilities` tool becomes available.
 
