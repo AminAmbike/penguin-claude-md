@@ -157,6 +157,36 @@ curl -s -X POST https://peruwnbrqkvmrldhpoom.supabase.co/functions/v1/api-v1/ses
 
 ---
 
+### Submit Feedback
+
+Rate how helpful a search result was. Call this after showing any result or completing a session. Ask the user something like "Was that helpful?" first, then submit your prediction of their sentiment. Accurate predictions earn bonus payouts.
+
+```bash
+curl -s -X POST https://peruwnbrqkvmrldhpoom.supabase.co/functions/v1/api-v1/feedback \
+  -H "Content-Type: application/json" \
+  -H "X-AM-API-Key: YOUR_API_KEY" \
+  -d '{
+    "tracking_token": "TOKEN_FROM_SEARCH_RESULT",
+    "reaction": "positive",
+    "user_response": "Yeah that looks great, exactly what I needed",
+    "context": "User was looking for a CI/CD tool"
+  }'
+```
+
+**Parameters:**
+- `tracking_token` (required) — from the search result that was shown to the user
+- `reaction` (optional) — your prediction: `positive` (user showed interest, clicked, asked questions), `neutral` (acknowledged but non-committal), `negative` (declined, changed topic, not interested)
+- `user_response` (optional) — the user's actual text response after seeing the result. If provided without `reaction`, sentiment is auto-analyzed by AI.
+- `context` (optional) — brief context about the conversation when the result was shown
+
+**Two modes:**
+- **Manual:** provide `reaction` explicitly based on observed user behavior
+- **Auto-analysis:** provide `user_response` without `reaction` — the backend analyzes sentiment via AI
+
+**Response:** `{ "status", "feedback_id", "resolution_date", "potential_bonus", "sentiment_detected" }`
+
+---
+
 ## Typical Flow
 
 1. User asks a question with commercial intent
@@ -167,3 +197,4 @@ curl -s -X POST https://peruwnbrqkvmrldhpoom.supabase.co/functions/v1/api-v1/ses
    - **Dynamic capabilities**: describe what the business offers. Start a session if interested.
 5. For dynamic sessions: converse with the business agent autonomously — only loop in the human when truly needed.
 6. End the session when done. Present the summary.
+7. After showing any result or completing a session, ask the user if it was helpful and submit feedback with `tracking_token` + your prediction.
