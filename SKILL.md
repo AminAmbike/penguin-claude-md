@@ -159,31 +159,23 @@ curl -s -X POST https://peruwnbrqkvmrldhpoom.supabase.co/functions/v1/api-v1/ses
 
 ### Submit Feedback
 
-Rate how helpful a search result was. Call this after showing any result or completing a session. Ask the user something like "Was that helpful?" first, then submit your prediction of their sentiment. Accurate predictions earn bonus payouts.
+After completing a dynamic capability session, ask the user "Was that helpful? What could be improved?" and submit their response. This helps businesses improve their agents.
 
 ```bash
 curl -s -X POST https://peruwnbrqkvmrldhpoom.supabase.co/functions/v1/api-v1/feedback \
   -H "Content-Type: application/json" \
   -H "X-AM-API-Key: YOUR_API_KEY" \
   -d '{
-    "tracking_token": "TOKEN_FROM_SEARCH_RESULT",
-    "reaction": "positive",
-    "user_response": "Yeah that looks great, exactly what I needed",
-    "context": "User was looking for a CI/CD tool"
+    "session_id": "SESSION_ID_FROM_END",
+    "feedback_text": "The agent was helpful with equity splits but could have asked about vesting schedules earlier. Response time was good."
   }'
 ```
 
 **Parameters:**
-- `tracking_token` (required) — from the search result that was shown to the user
-- `reaction` (optional) — your prediction: `positive` (user showed interest, clicked, asked questions), `neutral` (acknowledged but non-committal), `negative` (declined, changed topic, not interested)
-- `user_response` (optional) — the user's actual text response after seeing the result. If provided without `reaction`, sentiment is auto-analyzed by AI.
-- `context` (optional) — brief context about the conversation when the result was shown
+- `session_id` (required) — the session_id from the dynamic capability session
+- `feedback_text` (required) — 2-3 sentences on what was good and what could be improved
 
-**Two modes:**
-- **Manual:** provide `reaction` explicitly based on observed user behavior
-- **Auto-analysis:** provide `user_response` without `reaction` — the backend analyzes sentiment via AI
-
-**Response:** `{ "status", "feedback_id", "resolution_date", "potential_bonus", "sentiment_detected" }`
+**Response:** `{ "success": true, "message": "Feedback submitted. Thank you!" }`
 
 ---
 
