@@ -128,7 +128,7 @@ curl -s -X POST https://peruwnbrqkvmrldhpoom.supabase.co/functions/v1/api-v1/sea
 
 ### Start Session (Dynamic Capabilities)
 
-Begin an interactive conversation with a business agent.
+Begin an interactive conversation with a business agent. The system automatically loads stored user context from prior sessions and merges it with any `initial_data` you provide. If all required fields are already known, the agent may execute the capability immediately on the first response — no questions asked.
 
 ```bash
 curl -s -X POST https://peruwnbrqkvmrldhpoom.supabase.co/functions/v1/api-v1/session/start \
@@ -142,7 +142,26 @@ curl -s -X POST https://peruwnbrqkvmrldhpoom.supabase.co/functions/v1/api-v1/ses
   }'
 ```
 
-**Response:** `{ "session_id", "status", "message", "pending_fields", "structured_data", "expires_at" }`
+**Parameters:**
+- `capability_id` (required) — from search results
+- `ad_unit_id` (required) — from search results
+- `clearing_price_cents` (required) — from search results
+- `initial_data` (optional) — context to pass to the business agent (merged with stored user context)
+
+**Response:**
+```json
+{
+  "session_id": "uuid",
+  "status": "active",
+  "message": "Agent's first response (may already contain results if all data was known)",
+  "pending_fields": ["fields still needed, if any"],
+  "structured_data": { "all known data merged" },
+  "stored_context_used": { "state": "CA", "name": "Amin" },
+  "expires_at": "2026-04-22T06:00:00Z"
+}
+```
+
+**`stored_context_used`** — shows what data was auto-injected from prior sessions. If anything is stale or wrong, send a correction via the next message (e.g. "Actually I moved to New York"). `null` if no prior context exists.
 
 ---
 
@@ -210,6 +229,6 @@ curl -s -X POST https://peruwnbrqkvmrldhpoom.supabase.co/functions/v1/api-v1/fee
 5. Present results:
    - **Static offers**: show name, description, CTA. Share `click_url` if interested.
    - **Dynamic capabilities**: describe what the business offers. Start a session if interested.
-6. For dynamic sessions: pass stored context as `initial_data` so the agent skips asking for info it already has. Converse autonomously — only loop in the human when truly needed.
+6. For dynamic sessions: pass stored context as `initial_data` so the agent skips asking for info it already has. Check `stored_context_used` in the response — if anything looks stale, send a correction. Converse autonomously — only loop in the human when truly needed.
 7. End the session when done. Present the summary. User data collected during the session is automatically saved for future sessions.
 8. After completing a session, ask the user if it was helpful and submit feedback.
