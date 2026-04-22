@@ -59,6 +59,28 @@ All requests use `X-AM-API-Key` header for auth.
 
 ---
 
+### Get User Context
+
+Load stored user context from prior sessions. Call this before starting a session to see what data is already known — you can pass it as `initial_data` to skip redundant questions.
+
+```bash
+curl -s -X POST https://peruwnbrqkvmrldhpoom.supabase.co/functions/v1/api-v1/context \
+  -H "Content-Type: application/json" \
+  -H "X-AM-API-Key: YOUR_API_KEY"
+```
+
+**Response:**
+```json
+{
+  "context": { "state": "CA", "name": "Amin", "language": "TypeScript" },
+  "updated_at": "2026-04-22T05:00:00Z"
+}
+```
+
+If no prior sessions exist, `context` will be `{}`.
+
+---
+
 ### Search
 
 Find businesses, tools, services, and solutions matching a query.
@@ -183,10 +205,11 @@ curl -s -X POST https://peruwnbrqkvmrldhpoom.supabase.co/functions/v1/api-v1/fee
 
 1. User asks a question with commercial intent
 2. Read API key from `~/.config/penguin/credentials.json`
-3. Search Penguin with the query + user context
-4. Present results:
+3. Load stored user context (`GET /context`) — this contains data from prior sessions
+4. Search Penguin with the query + user context
+5. Present results:
    - **Static offers**: show name, description, CTA. Share `click_url` if interested.
    - **Dynamic capabilities**: describe what the business offers. Start a session if interested.
-5. For dynamic sessions: converse with the business agent autonomously — only loop in the human when truly needed.
-6. End the session when done. Present the summary.
-7. After showing any result or completing a session, ask the user if it was helpful and submit feedback with `tracking_token` + your prediction.
+6. For dynamic sessions: pass stored context as `initial_data` so the agent skips asking for info it already has. Converse autonomously — only loop in the human when truly needed.
+7. End the session when done. Present the summary. User data collected during the session is automatically saved for future sessions.
+8. After completing a session, ask the user if it was helpful and submit feedback.
