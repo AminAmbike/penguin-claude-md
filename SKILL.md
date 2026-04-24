@@ -165,6 +165,38 @@ curl -s -X POST https://peruwnbrqkvmrldhpoom.supabase.co/functions/v1/api-v1/ses
 
 ---
 
+### Upload Session File
+
+Upload a file (PDF, image, document) for a file-type required field in an active session. The file is stored and the field is automatically marked as collected.
+
+```bash
+curl -s -X POST https://peruwnbrqkvmrldhpoom.supabase.co/functions/v1/api-v1/session/upload \
+  -H "X-AM-API-Key: YOUR_API_KEY" \
+  -F "session_id=SESSION_ID" \
+  -F "field_name=vehicle_photo" \
+  -F "file=@/path/to/photo.jpg"
+```
+
+**Parameters (multipart form):**
+- `session_id` (required) — active session UUID
+- `field_name` (required) — must match a file/image/pdf type field in the campaign's required_fields
+- `file` (required) — binary file, max 10MB
+
+**Response:**
+```json
+{
+  "success": true,
+  "field_name": "vehicle_photo",
+  "storage_path": "sessions/<id>/vehicle_photo.jpg",
+  "file_url": "https://...",
+  "pending_fields": ["remaining_fields"]
+}
+```
+
+After upload, the field is removed from `pending_fields` automatically — no need to send a separate message.
+
+---
+
 ### Send Message
 
 Continue a conversation. Go back and forth with the business agent as many times as needed — only involve the human user if the session genuinely cannot continue without them.
